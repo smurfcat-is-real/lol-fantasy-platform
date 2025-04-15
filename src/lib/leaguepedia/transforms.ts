@@ -7,6 +7,7 @@ export interface RawPlayerData {
   TotalDeaths?: number;
   TotalAssists?: number;
   KDA?: number;
+  AverageCS?: number;
 }
 
 export interface RawMatchData {
@@ -97,4 +98,25 @@ function getTeamMultiplier(team: string): number {
   if (highTierTeams.includes(team)) return 1.15;
   
   return 1;
+}
+
+// Helper function to extract player name from href link
+export function extractPlayerName(playerLink: string): string {
+  // Example link: "[[Player Name]]"
+  const match = playerLink.match(/\[\[(.*?)\]\]/);
+  if (match && match[1]) {
+    return match[1];
+  }
+  return playerLink;
+}
+
+// Helper function to map player names to IDs
+export function createPlayerNameToIdMap(players: ProcessedPlayer[]): Record<string, string> {
+  const map: Record<string, string> = {};
+  
+  players.forEach(player => {
+    map[player.name.toLowerCase()] = player.externalId;
+  });
+  
+  return map;
 }
