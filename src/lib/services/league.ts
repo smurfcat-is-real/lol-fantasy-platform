@@ -94,9 +94,28 @@ export class LeagueService {
   }
 
   async deleteLeague(id: string): Promise<League> {
-    // Note: This should include cascading deletion strategy
+    // This will cascade delete all teams and players on teams
     return prisma.league.delete({
       where: { id }
+    });
+  }
+
+  async getLeagueStandings(leagueId: string): Promise<{ team: Team, position: number }[]> {
+    const teams = await prisma.team.findMany({
+      where: { leagueId },
+      orderBy: { points: 'desc' }
+    });
+
+    return teams.map((team, index) => ({
+      team,
+      position: index + 1
+    }));
+  }
+
+  async updateTeamPoints(teamId: string, points: number): Promise<Team> {
+    return prisma.team.update({
+      where: { id: teamId },
+      data: { points }
     });
   }
 }
