@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 // Mock implementation of CargoClient since mwcargoclient might not be readily available
-// In a real implementation, you would use the actual mwcargoclient library
 class CargoClient {
   private baseUrl: string;
 
@@ -11,6 +10,8 @@ class CargoClient {
 
   async queryAndFormat(query: any) {
     try {
+      // In a real implementation, this would use the mwcargoclient library
+      // This is a simplified implementation for demonstration
       const response = await axios.get(this.baseUrl, {
         params: {
           action: 'cargoquery',
