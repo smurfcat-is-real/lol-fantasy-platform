@@ -36,7 +36,7 @@ export class ScoreCalculator {
       points += this.POINTS.KDA_BONUS;
     }
     
-    return Math.round(points * 100) / 100; // Round to 2 decimal places
+    return points;
   }
 
   private calculateKDA(stats: MatchStats): number {
@@ -48,19 +48,5 @@ export class ScoreCalculator {
     return statsList.reduce((total, stats) => {
       return total + this.calculatePoints(stats);
     }, 0);
-  }
-
-  // Apply role-specific modifiers to points
-  applyRoleModifiers(points: number, role: string): number {
-    const roleModifiers: Record<string, number> = {
-      'TOP': 1.0,
-      'JUNGLE': 1.05,
-      'MID': 1.1,
-      'BOT': 1.15,
-      'SUPPORT': 0.9
-    };
-    
-    const modifier = roleModifiers[role] || 1.0;
-    return Math.round(points * modifier * 100) / 100;
   }
 }
