@@ -1,0 +1,89 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  passwordHash  String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  teams         Team[]
+  leagues       League[]
+}
+
+model League {
+  id          String    @id @default(cuid())
+  name        String
+  ownerId     String
+  owner       User      @relation(fields: [ownerId], references: [id])
+  teams       Team[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  seasonId    String
+  maxTeams    Int       @default(10)
+  maxPlayers  Int       @default(8)
+  budget      Float     @default(100000000)
+}
+
+model Team {
+  id        String    @id @default(cuid())
+  name      String
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  leagueId  String
+  league    League    @relation(fields: [leagueId], references: [id])
+  players   PlayerOnTeam[]
+  points    Int       @default(0)
+  budget    Float
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Player {
+  id          String    @id @default(cuid())
+  name        String
+  role        String
+  team        String
+  price       Float
+  externalId  String    @unique
+  teams       PlayerOnTeam[]
+  stats       PlayerStats[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model PlayerOnTeam {
+  id        String    @id @default(cuid())
+  playerId  String
+  player    Player    @relation(fields: [playerId], references: [id])
+  teamId    String
+  team      Team      @relation(fields: [teamId], references: [id])
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+
+  @@unique([playerId, teamId])
+}
+
+model PlayerStats {
+  id        String    @id @default(cuid())
+  playerId  String
+  player    Player    @relation(fields: [playerId], references: [id])
+  matchId   String
+  kills     Int
+  deaths    Int
+  assists   Int
+  cs        Int
+  victory   Boolean
+  date      DateTime
+  points    Float
+  createdAt DateTime  @default(now())
+
+  @@unique([playerId, matchId])
+}
