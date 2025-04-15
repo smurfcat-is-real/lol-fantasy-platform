@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-// Implementing a simplified version of CargoClient for the Leaguepedia API
+// Mock implementation of CargoClient since mwcargoclient might not be readily available
+// In a real implementation, you would use the actual mwcargoclient library
 class CargoClient {
   private baseUrl: string;
 
@@ -10,8 +11,6 @@ class CargoClient {
 
   async queryAndFormat(query: any) {
     try {
-      // In a real implementation, this would use the mwcargoclient library
-      // This is a simplified implementation for demonstration
       const response = await axios.get(this.baseUrl, {
         params: {
           action: 'cargoquery',
@@ -19,13 +18,13 @@ class CargoClient {
           tables: query.tables,
           fields: query.fields.join(','),
           where: query.where,
-          join_on: query.join_on || '',
+          join_on: query.join_on,
           limit: 500,
         }
       });
 
       // Transform response to expected format
-      return response.data.cargoquery?.map((item: any) => item.title) || [];
+      return response.data.cargoquery.map((item: any) => item.title);
     } catch (error) {
       console.error('Error querying Leaguepedia API:', error);
       throw error;
@@ -67,9 +66,7 @@ export class LeaguepediaClient {
         "SP.Assists",
         "SP.CS",
         "SG.DateTime_UTC AS Date",
-        "SG.Winner",
-        "SG.Team1 AS Team1",
-        "SG.Team2 AS Team2"
+        "SG.Winner"
       ],
       where: `SG.Tournament='${tournament}'`,
       join_on: "SG.GameId=SP.GameId"
@@ -93,22 +90,6 @@ export class LeaguepediaClient {
         "TP.AverageCS"
       ],
       where: `TP.Tournament='${tournament}'`,
-      join_on: ""
-    };
-
-    return await this.client.queryAndFormat(query);
-  }
-
-  async getTournaments() {
-    const query = {
-      tables: "Tournaments=T",
-      fields: [
-        "T.Name",
-        "T.Date",
-        "T.League",
-        "T.Region"
-      ],
-      where: "T.Date >= '2023-01-01'",
       join_on: ""
     };
 
