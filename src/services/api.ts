@@ -67,15 +67,3 @@ export const marketAPI = {
     return response.data;
   }
 };
-
-export const teamAPI = {
-  getTeamPlayers: async (teamId: string): Promise<Player[]> => {
-    const response = await api.get(`/teams/${teamId}/players`);
-    return response.data;
-  },
-  
-  updateTeamName: async (teamId: string, name: string): Promise<Team> => {
-    const response = await api.put(`/teams/${teamId}`, { name });
-    return response.data;
-  }
-};
