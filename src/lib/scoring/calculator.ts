@@ -50,42 +50,17 @@ export class ScoreCalculator {
     }, 0);
   }
 
-  // Calculate fantasy points based on role-specific performance
-  calculateRoleAdjustedPoints(stats: MatchStats, role: string): number {
-    let points = this.calculatePoints(stats);
+  // Apply role-specific modifiers to points
+  applyRoleModifiers(points: number, role: string): number {
+    const roleModifiers: Record<string, number> = {
+      'TOP': 1.0,
+      'JUNGLE': 1.05,
+      'MID': 1.1,
+      'BOT': 1.15,
+      'SUPPORT': 0.9
+    };
     
-    // Apply role-specific modifiers
-    switch (role.toUpperCase()) {
-      case 'TOP':
-        // Top laners get bonus for high CS
-        if (stats.cs > 200) {
-          points += 1;
-        }
-        break;
-      case 'JUNGLE':
-        // Junglers get bonus for high assist counts
-        if (stats.assists > 10) {
-          points += 1.5;
-        }
-        break;
-      case 'MID':
-        // Mid laners get bonus for high kill counts
-        if (stats.kills > 5) {
-          points += 1;
-        }
-        break;
-      case 'BOT':
-        // Bot laners (ADCs) get bonus for high CS and kills
-        if (stats.cs > 220 && stats.kills > 4) {
-          points += 1.5;
-        }
-        break;
-      case 'SUPPORT':
-        // Supports get more points for assists
-        points += stats.assists * 0.5;
-        break;
-    }
-    
-    return Math.round(points * 100) / 100; // Round to 2 decimal places
+    const modifier = roleModifiers[role] || 1.0;
+    return Math.round(points * modifier * 100) / 100;
   }
 }
