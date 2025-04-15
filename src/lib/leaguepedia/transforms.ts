@@ -7,7 +7,6 @@ export interface RawPlayerData {
   TotalDeaths?: number;
   TotalAssists?: number;
   KDA?: number;
-  AverageCS?: number;
 }
 
 export interface RawMatchData {
@@ -19,8 +18,6 @@ export interface RawMatchData {
   CS: number;
   Date: string;
   Winner: string;
-  Team1: string;
-  Team2: string;
 }
 
 export interface ProcessedPlayer {
@@ -52,8 +49,6 @@ export function transformPlayerData(raw: RawPlayerData): ProcessedPlayer {
 }
 
 export function transformMatchData(raw: RawMatchData, playerExternalId: string): ProcessedMatchStat {
-  const playerTeam = getPlayerTeamFromMatch(raw);
-  
   return {
     playerExternalId,
     kills: Number(raw.Kills) || 0,
@@ -61,14 +56,8 @@ export function transformMatchData(raw: RawMatchData, playerExternalId: string):
     assists: Number(raw.Assists) || 0,
     cs: Number(raw.CS) || 0,
     date: new Date(raw.Date),
-    victory: raw.Winner === playerTeam
+    victory: raw.Winner === raw.Player
   };
-}
-
-function getPlayerTeamFromMatch(match: RawMatchData): string {
-  // In a real implementation, we would determine which team the player belongs to
-  // This is a simplified implementation
-  return match.Team1; // Simplified assumption
 }
 
 function calculateInitialPrice(player: RawPlayerData): number {
@@ -84,7 +73,7 @@ function calculateInitialPrice(player: RawPlayerData): number {
     'SUPPORT': 0.9
   };
   
-  // Team tier multipliers
+  // Team tier multipliers (simplified)
   const teamMultiplier = getTeamMultiplier(player.Team);
   
   // Performance multiplier if stats are available
