@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 // Mock implementation of CargoClient since mwcargoclient might not be readily available
+// In a production environment, you would use the actual mwcargoclient library
 class CargoClient {
   private baseUrl: string;
 
@@ -91,6 +92,25 @@ export class LeaguepediaClient {
         "TP.AverageCS"
       ],
       where: `TP.Tournament='${tournament}'`,
+      join_on: ""
+    };
+
+    return await this.client.queryAndFormat(query);
+  }
+
+  // Add additional methods as needed for the application
+  async getTournaments() {
+    const query = {
+      tables: "Tournaments=T",
+      fields: [
+        "T.Name",
+        "T.Region",
+        "T.League",
+        "T.DateStart",
+        "T.DateEnd",
+        "T.Type"
+      ],
+      where: "T.DateStart >= '2023-01-01'",
       join_on: ""
     };
 
