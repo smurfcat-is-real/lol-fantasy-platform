@@ -36,7 +36,7 @@ export class ScoreCalculator {
       points += this.POINTS.KDA_BONUS;
     }
     
-    return points;
+    return Math.round(points * 100) / 100; // Round to 2 decimal places
   }
 
   private calculateKDA(stats: MatchStats): number {
@@ -48,5 +48,30 @@ export class ScoreCalculator {
     return statsList.reduce((total, stats) => {
       return total + this.calculatePoints(stats);
     }, 0);
+  }
+
+  // Calculate player performance ratings (0-10 scale)
+  calculatePerformanceRating(stats: MatchStats): number {
+    const points = this.calculatePoints(stats);
+    
+    // Convert points to a 0-10 scale
+    // Assuming 0 points = 0 rating, and 20 points = 10 rating
+    let rating = (points / 20) * 10;
+    
+    // Clamp between 0 and 10
+    rating = Math.max(0, Math.min(10, rating));
+    
+    return Math.round(rating * 10) / 10; // Round to 1 decimal place
+  }
+
+  // Calculate average rating over multiple matches
+  calculateAverageRating(statsList: MatchStats[]): number {
+    if (statsList.length === 0) return 0;
+    
+    const totalRating = statsList.reduce((sum, stats) => {
+      return sum + this.calculatePerformanceRating(stats);
+    }, 0);
+    
+    return Math.round((totalRating / statsList.length) * 10) / 10;
   }
 }
