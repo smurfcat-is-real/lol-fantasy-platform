@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { LeagueService } from '@/lib/services/league';
-import { prisma } from '@/lib/prisma';
 
 const leagueService = new LeagueService();
 
@@ -29,6 +28,15 @@ export async function POST(request: Request) {
     }
 
     const data = await request.json();
+    
+    // Validate required fields
+    if (!data.name || !data.seasonId) {
+      return NextResponse.json(
+        { message: 'Name and seasonId are required' },
+        { status: 400 }
+      );
+    }
+    
     const league = await leagueService.createLeague({
       ...data,
       ownerId: session.user.id
