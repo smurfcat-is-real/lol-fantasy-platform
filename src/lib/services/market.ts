@@ -57,6 +57,20 @@ export class MarketService {
       return { success: false, message: 'Team is full' };
     }
 
+    // Check if player is already in another team in this league
+    const existingPlayerOnTeam = await prisma.playerOnTeam.findFirst({
+      where: {
+        playerId,
+        team: {
+          leagueId: team.league.id
+        }
+      }
+    });
+
+    if (existingPlayerOnTeam) {
+      return { success: false, message: 'Player is already on another team in this league' };
+    }
+
     // Execute transaction
     await prisma.$transaction([
       prisma.playerOnTeam.create({
@@ -114,5 +128,49 @@ export class MarketService {
     ]);
 
     return { success: true, message: 'Player sold successfully' };
+  }
+
+  async getTeamPlayers(teamId: string): Promise<Player[]> {
+    const playersOnTeam = await prisma.playerOnTeam.findMany({
+      where: { teamId },
+      include: { player: true }
+    });
+
+    return playersOnTeam.map(pot => pot.player);
+  }
+
+  async searchPlayers(query: string, leagueId?: string): Promise<Player[]> {
+    // Basic search functionality
+    let players = await prisma.player.findMany({
+      where: {
+        OR: [
+          { name: { contains: query, mode: 'insensitive' } },
+          { team: { contains: query, mode: 'insensitive' } },
+          { role: { equals: query.toUpperCase() } }
+        ]
+      },
+      orderBy: { price: 'desc' },
+      take: 20
+    });
+
+    // If leagueId is provided, filter out players already in teams
+    if (leagueId) {
+      const takenPlayerIds = await prisma.playerOnTeam.findMany({
+        where: {
+          team: {
+            leagueId
+          }
+        },
+        select: {
+          playerId: true
+        }
+      });
+
+      players = players.filter(
+        player => !takenPlayerIds.some(p => p.playerId === player.id)
+      );
+    }
+
+    return players;
   }
 }
